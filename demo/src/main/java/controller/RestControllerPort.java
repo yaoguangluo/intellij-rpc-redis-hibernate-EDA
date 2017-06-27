@@ -48,7 +48,47 @@ public class RestControllerPort{
 	
 	private static Logger logger = LogManager.getLogger(RestControllerPort.class.getName());
 		
-	
+	        @GET
+	        @GetMapping("/bb")    
+		@Produces("application/json;charset=utf-8")
+		public  Map<String, Object>  omgThisIsPossible(@QueryParam("aa") int aa) throws IOException 
+	    {	/*
+	    	 Session session = HibernateUtil.getSessionFactory().openSession();
+			 session.beginTransaction();
+	    	 Map<String, Object> result=new HashMap<String, Object>();
+		 	 
+		 	 String hql = "FROM Lolroler as l where l.name= :userName";
+		 	
+		 	 Query query = session.createQuery(hql);
+		 	 query.setString("userName", "Vi");
+		 	 List<Lolroler> results = query.list(); 
+		 	 session.getTransaction().commit();
+		 	 result.put("end", results);
+			
+			 return Response.status(Status.OK).entity(result).build();
+			 */
+	    	
+	    	if(null == redisTemplate.opsForValue().get("click")){		
+				redisTemplate.opsForValue().set("click", "0" , 24000 , TimeUnit.HOURS);
+			}else{
+				String click = redisTemplate.opsForValue().get("click");
+				long click_long = Long.parseLong(click);
+				click_long += 1;
+				redisTemplate.opsForValue().set("click", String.valueOf(click_long) , 24000 , TimeUnit.HOURS);
+			}	       
+	    	
+	    	EventDispatcher dispatcher = new EventDispatcher();
+	        dispatcher.registerHandler(UserCreatedEvent.class, new UserCreatedEventHandler());
+	      
+	        User user = new User("iluwatar");
+	        dispatcher.dispatch(new UserCreatedEvent(user));
+
+	    	
+	    	 Map<String, Object> result=new HashMap<String, Object>();
+	    	 result.put("end", user.getUsername());
+	    	 return result;
+		}
+
 	    @GET
 	    @GetMapping("/aa")    
 		@Produces("application/json;charset=utf-8")
